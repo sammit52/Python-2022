@@ -150,10 +150,12 @@ def draws():
 		@when("unscrew screw")
 		@when("unscrew flathead screw")
 		def unscrew_broken_draw_handle():
-			if handcuff_locked == False and "coin" in inventory and draw_handle_unscrewed == False:
+			if "coin" in inventory:
 				print("You use the coin to unscrew the handle and it falls on the ground.")
 				Bedroom1.items.add(Broken_Draw_Handle)
+				print(draw_handle_unscrewed)
 				draw_handle_unscrewed = True
+				print(draw_handle_unscrewed)
 			else:
 				print("You don't have a 'coin' in your inventory")
 	elif handcuff_locked == False and draw_handle_unscrewed == True:
