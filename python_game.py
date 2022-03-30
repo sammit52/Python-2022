@@ -32,7 +32,7 @@ Hallway.west = Bedroom2
 #DEFINE ITEMS
 ###################################
 Item.description = ""
-Broken_Draw_Handle = Item("")
+Broken_Draw_Handle = Item("draw handle","broken draw handle","handle")
 Newspaper1 = Item("")
 Documents = Item("")
 Gun = Item("")
@@ -70,6 +70,8 @@ found_paperclip = False
 handcuff_locked = True
 Bedroom1_escape = False
 draw_handle_unscrewed = False
+move_bed = False
+
 
 
 ###################################
@@ -110,8 +112,6 @@ if wakeup == False and current_room == Bedroom1:
 if Bedroom1_escape == True:
 	Bedroom1.east = Lounge
 
-
-
 @when("pick lock")
 @when("pick cuff")
 @when("pick handcuff")
@@ -149,17 +149,18 @@ def draws():
 		@when("use coin")
 		@when("unscrew screw")
 		@when("unscrew flathead screw")
-		def unscrew_broken_draw_handle():
-			if "coin" in inventory:
-				print("You use the coin to unscrew the handle and it falls on the ground.")
-				Bedroom1.items.add(Broken_Draw_Handle)
-				print(draw_handle_unscrewed)
-				draw_handle_unscrewed = True
-				print(draw_handle_unscrewed)
+		def unscrew_handle():
+			global draw_handle_unscrewed
+			if "coin" in inventory and draw_handle_unscrewed == False:
+				draw_handle_unscrewed = True 
+				print("You unscrew the draw handle and it falls to the ground.")
+				current_room.items.add(Broken_Draw_Handle)
+			elif draw_handle_unscrewed == True:
+				print("You have already used coin")
 			else:
-				print("You don't have a 'coin' in your inventory")
+				print("You don't have 'coin' in your inventory")
 	elif handcuff_locked == False and draw_handle_unscrewed == True:
-		print("You walk over to the draws and open them. There's nothing inside them.")
+		print("You walk over to the draws and open them. There's nothing inside them")
 	else:
 		print("You can't do that when you are handcuffed")
 
@@ -168,8 +169,16 @@ def draws():
 @when("explore bed")
 def bed():
 	global handcuff_locked
-	if handcuff_locked == False:
+	global move_bed
+	if handcuff_locked == False and move_bed == False:
 		print("You go over to the bed. It has white sheets, a pillow and seems to be moveable.")
+		@when("move bed")
+		def move_bed():
+			global move_bed
+			move_bed = True
+			print("You move the bed and reveal a vent.")
+	elif move_bed == True:
+		print("You go over to the bed. It has white sheet, a pillow and there is a vent to the side of it.")
 	else:
 		print("You can't do that when you are handcuffed")
 
@@ -207,16 +216,17 @@ def travel(direction):
 		print("You can't go that way")
 
 @when("look")
+@when("explore room")
 def look():
 	global current_room
 	print(current_room)
 	exits_amount = int(len(current_room.exits()))
 	if exits_amount == 1:
 		#grammatically correct way of saying there is one exit
-		print(f"There is a visble exit to the {', '.join(current_room.exits())}")
+		print(f"There is a visible exit to the {', '.join(current_room.exits())}")
 	elif exits_amount > 1:
 		#grammatically correct way of saying there is more than one exit
-		print(f"There are visble exits to the {', '.join(current_room.exits()[:-1]) + ' and ' + current_room.exits()[-1]}")
+		print(f"There are visible exits to the {', '.join(current_room.exits()[:-1]) + ' and ' + current_room.exits()[-1]}")
 	else:
 		print("There are no visible exits")
 
@@ -231,3 +241,5 @@ def main():
 	#start the main loop
 
 main()
+
+
